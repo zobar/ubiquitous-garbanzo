@@ -1,17 +1,13 @@
-# Spanner: AsyncRunner.runAsync blocks executor; deadlock possible
-
-**Reference issue:** googleapis/java-spanner#2698
-
 `AsyncRunner.runAsync` performs a [blocking get](https://github.com/googleapis/java-spanner/blob/v6.52.1/google-cloud-spanner/src/main/java/com/google/cloud/spanner/AsyncRunnerImpl.java#L60) inside its executor. This may result in deadlock if the following conditions are met:
 * The executor is a thread pool with a maximum size.
-* The thread pool is also used by the work provided to `runAsync`.
+* The same thread pool is also used by the work itself.
 * The number of concurrent transactions is equal to or greater than the maximum number of threads.
 
-This is most likely to manifest itself if the application has a constrained global thread pool optimized for running non-blocking operations. In particular, we noticed this in a `cats-effect` application, although the bug is not restricted to Scala or `cats-effect`. This is likely to be the underlying cause of #1751.
+This is most likely to manifest itself if the application has a constrained global thread pool optimized for running non-blocking operations. In particular, we noticed this in a Cats Effect application, although the bug is not restricted to Scala or Cats Effect. This may also be causing the performance problems noted in #1751.
 
 Our workaround is to provide a dedicated thread pool that is only used for `runAsync`, but which is not used by the work itself.
 
-I've built a [minimum test case](https://github.com/zobar/ubiquitous-garbanzo/blob/main/app/src/main/java/com/jackhenry/dkleinschmidt/App.java) to demonstrate this issue.
+I've built a [minimum test case](https://github.com/zobar/ubiquitous-garbanzo/blob/main/app/src/main/java/com/jackhenry/dkleinschmidt/App.java) in Java to demonstrate this issue.
 
 #### Environment details
 
