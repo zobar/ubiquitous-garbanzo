@@ -1,4 +1,6 @@
-# googleapis/java-spanner#2698
+# Spanner: AsyncRunner.runAsync blocks executor; deadlock possible
+
+**Reference issue:** googleapis/java-spanner#2698
 
 `AsyncRunner.runAsync` performs a [blocking get](https://github.com/googleapis/java-spanner/blob/v6.52.1/google-cloud-spanner/src/main/java/com/google/cloud/spanner/AsyncRunnerImpl.java#L60) inside its executor. This may result in deadlock if the following conditions are met:
 * The executor is a thread pool with a maximum size.
