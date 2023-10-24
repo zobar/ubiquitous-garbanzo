@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     // This dependency is used by the application.
-    implementation("com.google.guava:guava:32.1.1-jre")
+    implementation("com.google.cloud:google-cloud-spanner:6.52.1")
 }
 
 testing {
